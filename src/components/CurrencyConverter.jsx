@@ -1,9 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 
 const CurrencyConverter = () => {
   const [currencies, setCurrencies] = useState([]);
   const [amount, setAmount] = useState(1);
+
+  const fetchCurrencies = async () => {
+    try {
+      const apiKey = import.meta.env.VITE_API_KEY;
+      const res = await fetch(`https://api.exchangeratesapi.io/v1/symbols?access_key=${apiKey}`);
+      const data = await res.json();
+      setCurrencies(data);
+    } catch (error) {
+      console.error("Error fetching", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrencies();
+  }, []);
+
+  console.log(currencies);
+  
+
   return (
     <div className="max-w-xl mx-auto my-10 p-5 bg-white rounded-lg shadow-md">
       <h2 className="mb-5 text-2xl font-semibold text-gray-700">
