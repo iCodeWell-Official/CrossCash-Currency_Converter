@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import CurrencyDropdown from "./CurrencyDropdown";
+import { CgArrowsExchangeAlt } from "react-icons/cg";
 
 const CurrencyConverter = () => {
   const [currencies, setCurrencies] = useState([]);
@@ -31,20 +32,34 @@ const CurrencyConverter = () => {
     // conversion code
   };
 
+  const swapCurrencies = () => {
+    setFromCurrency(toCurrency);
+    setToCurrency(fromCurrency);
+  };
+
   return (
     <div className="max-w-xl mx-auto my-10 p-5 bg-white rounded-lg shadow-md">
-      <h2 className="mb-5 text-2xl font-semibold text-gray-700">
+      <h2 className="mb-5 text-2xl font-semibold text-gray-700 text-center">
         CrossCash Currency Converter
       </h2>
 
-      <div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
         <CurrencyDropdown
           currencies={currencies}
           title="From:"
           currency={fromCurrency}
           setCurrency={setFromCurrency}
         />
-        {/* swap button */}
+
+        <div className="flex justify-center -mb-5 sm:mb-0">
+          <button
+            onClick={swapCurrencies}
+            className="p-2 bg-gray-200 rounded-full cursor-pointer hover:bg-gray-300"
+          >
+            <CgArrowsExchangeAlt className="text-xl text-gray-700" />
+          </button>
+        </div>
+
         <CurrencyDropdown
           currencies={currencies}
           title="To:"
