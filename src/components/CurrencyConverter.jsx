@@ -8,15 +8,17 @@ const CurrencyConverter = () => {
   const [amount, setAmount] = useState(1);
   const [fromCurrency, setFromCurrency] = useState("EUR");
   const [toCurrency, setToCurrency] = useState("MAD");
+  const [convertedAmount, setConvertedAmount] = useState(null);
+  const [converting, setConverting] = useState(false);
 
   const fetchCurrencies = async () => {
     try {
       const apiKey = import.meta.env.VITE_API_KEY;
       const res = await fetch(
-        `https://api.exchangeratesapi.io/v1/symbols?access_key=${apiKey}`
+        `https://v6.exchangerate-api.com/v6/${apiKey}/codes`
       );
       const data = await res.json();
-      setCurrencies(Object.entries(data.symbols));
+      setCurrencies(data.supported_codes);
     } catch (error) {
       console.error("Error fetching", error);
     }
@@ -28,8 +30,23 @@ const CurrencyConverter = () => {
 
   console.log(currencies);
 
-  const convertCurrency = () => {
-    // conversion code
+  const convertCurrency = async () => {
+    if (!amount) return;
+    setConverting(true);
+
+    try {
+      const apiKey = import.meta.env.VITE_API_KEY;
+      const res = await fetch(
+        `https://v6.exchangerate-api.com/v6/${apiKey}/pair/${fromCurrency}/${toCurrency}/${amount}`
+      );
+      const data = await res.json();
+
+      setConvertedAmount(`${data.conversion_result} ${toCurrency}`);
+    } catch (error) {
+      console.error("Error fetching", error);
+    } finally {
+      setConverting(false);
+    }
   };
 
   const swapCurrencies = () => {
@@ -85,14 +102,18 @@ const CurrencyConverter = () => {
       <div className="flex justify-center mt-6">
         <button
           onClick={convertCurrency}
-          className="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className={`px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+            ${converting ? "animate-pulse" : ""}
+            `}
         >
           Convert!
         </button>
       </div>
-      <div className="mt-4 text-lg font-medium text-center text-red-600">
-        Result:
-      </div>
+      {convertedAmount && (
+        <div className="mt-4 text-lg font-medium text-center text-gray-700">
+          Conversion result: <span className="text-red-600">{convertedAmount}</span>
+        </div>
+      )}
     </div>
   );
 };
